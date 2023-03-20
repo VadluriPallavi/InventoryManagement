@@ -7,7 +7,7 @@ public class Item {
 	private long pricePerUnit;
 	private long quantity;
 	private long vendorId;
-	private long shelfNo;
+
 	
 	
 	
