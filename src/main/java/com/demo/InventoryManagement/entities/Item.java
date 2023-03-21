@@ -1,82 +1,57 @@
 package com.demo.InventoryManagement.entities;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
+import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import lombok.NonNull;
+
+import java.time.Instant;
+import java.time.LocalDateTime;
+import java.util.*;
+
+@Entity
+@Table(name = "item")
+@Data
+@AllArgsConstructor
+@NoArgsConstructor
 public class Item {
-	private long itemId;
-	private String itemName;
-	private long categoryId;
-	private long pricePerUnit;
-	private long quantity;
-	private long vendorId;
 
-	
-	
-	
-	public Item(long itemId, String itemName, long categoryId, long pricePerUnit, long quantity, long vendorId,
-			long shelfNo) {
-		super();
-		this.itemId = itemId;
-		this.itemName = itemName;
-		this.categoryId = categoryId;
-		this.pricePerUnit = pricePerUnit;
-		this.quantity = quantity;
-		this.vendorId = vendorId;
-		this.shelfNo = shelfNo;
-	}
-	
-	
-	public Item() {
-		super();
-		// TODO Auto-generated constructor stub
-	}
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "itemId")
+    private long itemId;
 
-	public long getItemId() {
-		return itemId;
-	}
-	public void setItemId(long itemId) {
-		this.itemId = itemId;
-	}
-	public String getItemName() {
-		return itemName;
-	}
-	public void setItemName(String itemName) {
-		this.itemName = itemName;
-	}
-	public long getCategoryId() {
-		return categoryId;
-	}
-	public void setCategoryId(long categoryId) {
-		this.categoryId = categoryId;
-	}
-	public long getPricePerUnit() {
-		return pricePerUnit;
-	}
-	public void setPricePerUnit(long pricePerUnit) {
-		this.pricePerUnit = pricePerUnit;
-	}
-	public long getQuantity() {
-		return quantity;
-	}
-	public void setQuantity(long quantity) {
-		this.quantity = quantity;
-	}
-	public long getVendorId() {
-		return vendorId;
-	}
-	public void setVendorId(long vendorId) {
-		this.vendorId = vendorId;
-	}
-	public long getShelfNo() {
-		return shelfNo;
-	}
-	public void setShelfNo(long shelfNo) {
-		this.shelfNo = shelfNo;
-	}
+    @Column(name = "itemName", unique = true)
+    @NonNull
+    private String itemName;
 
+    @ManyToOne(fetch = FetchType.EAGER, cascade = CascadeType.MERGE)
+    @JoinColumn(name = "categoryId", nullable = false)
+    private Category category;
 
-	@Override
-	public String toString() {
-		return "Item [itemId=" + itemId + ", itemName=" + itemName + ", categoryId=" + categoryId + ", pricePerUnit="
-				+ pricePerUnit + ", quantity=" + quantity + ", vendorId=" + vendorId + ", shelfNo=" + shelfNo + "]";
-	}
-	
+    @ManyToOne(fetch = FetchType.EAGER, cascade = CascadeType.MERGE)
+    @JoinColumn(name = "vendorId", nullable = false)
+    private Vendor vendor;
+
+    @NonNull
+    @Column(name = "pricePerUnit")
+    private long pricePerUnit;
+
+    @Column(name = "capacityConsumption")
+    @NonNull
+    private long capacityConsumption;
+
+//    @ManyToMany
+//    @JoinTable(
+//            name = "items_stored",
+//            joinColumns = @JoinColumn(name = "itemId"),
+//            inverseJoinColumns = @JoinColumn(name = "shelfId")
+//    )
+//    Set<Shelf> shelfLocations = new HashSet<>();;
+
+    @OneToMany(mappedBy = "item", cascade = CascadeType.ALL)
+    List<ItemQuantity> quantities = new ArrayList<>();;
+
 }

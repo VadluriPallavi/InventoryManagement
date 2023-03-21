@@ -1,37 +1,28 @@
 package com.demo.InventoryManagement.entities;
 
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import jakarta.persistence.*;
+import lombok.Data;
+
+import java.util.List;
+import java.util.Set;
+
+@Entity
+@Table(name = "category")
+@Data
 public class Category {
-	private long categoryId;
-	private String categoryName;
-	
-	
-	public Category(long categoryId, String categoryName) {
-		super();
-		this.categoryId = categoryId;
-		this.categoryName = categoryName;
-	}
-	
-	public Category() {
-		super();
-		// TODO Auto-generated constructor stub
-	}
 
-	public long getCategoryId() {
-		return categoryId;
-	}
-	public void setCategoryId(long categoryId) {
-		this.categoryId = categoryId;
-	}
-	public String getCategoryName() {
-		return categoryName;
-	}
-	public void setCategoryName(String categoryName) {
-		this.categoryName = categoryName;
-	}
+    @Id
+    @GeneratedValue(strategy = GenerationType.SEQUENCE)
+    @Column(name = "categoryId")
+    public long categoryId;
 
-	@Override
-	public String toString() {
-		return "Category [categoryId=" + categoryId + ", categoryName=" + categoryName + "]";
-	}
-	
+    @Column(name = "categoryName", unique = true)
+    private String categoryName;
+
+    @JsonIgnore
+    @OneToMany(mappedBy = "category")
+    List<Item> itemList;
+
 }
