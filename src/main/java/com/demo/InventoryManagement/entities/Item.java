@@ -52,6 +52,6 @@ public class Item {
 //    Set<Shelf> shelfLocations = new HashSet<>();;
 
     @OneToMany(mappedBy = "item", cascade = CascadeType.ALL)
-    List<ItemQuantity> quantities = new ArrayList<>();;
+    List<ItemQuantity> quantities = new ArrayList<>();
 
 }

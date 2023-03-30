@@ -3,6 +3,7 @@ package com.demo.InventoryManagement.controller;
 import com.demo.InventoryManagement.dto.RequestDto;
 import com.demo.InventoryManagement.entities.FilterList;
 import com.demo.InventoryManagement.entities.Item;
+import com.demo.InventoryManagement.exceptions.CustomErrorException;
 import com.demo.InventoryManagement.repository.ItemRepository;
 import com.demo.InventoryManagement.services.FilterSpecification;
 import com.demo.InventoryManagement.services.ItemService;
@@ -12,6 +13,8 @@ import jakarta.persistence.criteria.Predicate;
 import jakarta.persistence.criteria.Root;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.jpa.domain.Specification;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -32,8 +35,28 @@ public class ItemController {
     private FilterSpecification<Item> itemFilterSpecification;
 
     @GetMapping("/items")
-    public List<Item> getItems() {
-        return this.itemService.getItems();
+    public ResponseEntity<List<Item>> getItems() {
+
+        try {
+            List<Item> items = this.itemService.getItems();
+            if (items.size() == 0) {
+                throw new CustomErrorException(
+                        HttpStatus.NOT_FOUND,
+                        "There are no items found"
+                );
+            }
+            return ResponseEntity.of(Optional.of(items));
+        } catch (CustomErrorException e) {
+            throw new CustomErrorException(
+                    HttpStatus.NOT_FOUND,
+                    e.getMessage()
+            );
+        } catch (Exception e) {
+            throw new CustomErrorException(
+                    HttpStatus.INTERNAL_SERVER_ERROR,
+                    e.getMessage()
+            );
+        }
     }
 
     @GetMapping("/items/{itemId}")
@@ -42,8 +65,32 @@ public class ItemController {
     }
 
     @PostMapping("/items")
-    public Item addItem(@RequestBody Item item) {
-        return this.itemService.addItem(item);
+    public ResponseEntity<Item> addItem(@RequestBody Item item) {
+        Item item1 = null;
+
+        try {
+            if (itemRepository.existsByItemName(item.getItemName())) {
+                throw new CustomErrorException(
+                        HttpStatus.ALREADY_REPORTED,
+                        "Item already exists",
+                        item
+                );
+            }
+            item1 = this.itemService.addItem(item);
+            return ResponseEntity.of(Optional.of(item1));
+        } catch (CustomErrorException e) {
+            throw new CustomErrorException(
+                    HttpStatus.ALREADY_REPORTED,
+                    "Item already exists",
+                    item
+            );
+        } catch (Exception e) {
+            throw new CustomErrorException(
+                    HttpStatus.INTERNAL_SERVER_ERROR,
+                    "Error in adding item",
+                    item
+            );
+        }
     }
 
 

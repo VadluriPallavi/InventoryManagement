@@ -4,11 +4,13 @@ import com.demo.InventoryManagement.entities.FilterList;
 import com.demo.InventoryManagement.entities.Item;
 import com.demo.InventoryManagement.entities.ItemQuantity;
 import com.demo.InventoryManagement.entities.Shelf;
+import com.demo.InventoryManagement.exceptions.CustomErrorException;
 import com.demo.InventoryManagement.repository.ItemQuantityRepository;
 import com.demo.InventoryManagement.repository.ItemRepository;
 import com.demo.InventoryManagement.repository.ShelfRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.util.ReflectionUtils;
 
@@ -44,9 +46,14 @@ public class ItemServiceImpl implements ItemService {
 
     @Override
     public Item addItem(Item item) {
-        if (itemRepository.existsByItemName(item.getItemName())) {
-            return itemRepository.findByItemName(item.getItemName());
-        }
+//        if (itemRepository.existsByItemName(item.getItemName())) {
+//            System.out.println("item alredy exists");
+//            throw new CustomErrorException(
+//                    HttpStatus.ALREADY_REPORTED,
+//                    "Item already exists",
+//                    item
+//            );
+//        }
 
         Item newItem = new Item();
         newItem.setItemName(item.getItemName());

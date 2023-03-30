@@ -3,11 +3,13 @@ package com.demo.InventoryManagement.controller;
 
 import com.demo.InventoryManagement.constants.StatusCode;
 import com.demo.InventoryManagement.entities.Category;
+import com.demo.InventoryManagement.exceptions.CustomErrorException;
 import com.demo.InventoryManagement.models.Response;
 import com.demo.InventoryManagement.services.CategoryService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -20,13 +22,30 @@ public class CategoryController {
     @Autowired
     private CategoryService categoryService;
 
+
     @GetMapping("/categories")
     public ResponseEntity<List<Category>> getCategories() {
-        List<Category> categories = this.categoryService.getCategories();
-        if (categories.size() == 0) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+
+        try {
+            List<Category> categories = this.categoryService.getCategories();
+            if (categories.size() == 0) {
+                throw new CustomErrorException(
+                        HttpStatus.NOT_FOUND,
+                        "There are no categories found"
+                );
+            }
+            return ResponseEntity.of(Optional.of(categories));
+        } catch (CustomErrorException e) {
+            throw new CustomErrorException(
+                    HttpStatus.NOT_FOUND,
+                    "There are no categories found"
+            );
+        } catch (Exception e) {
+            throw new CustomErrorException(
+                    HttpStatus.INTERNAL_SERVER_ERROR,
+                    "Error in fetching categories list"
+            );
         }
-        return ResponseEntity.of(Optional.of(categories));
     }
 
     @GetMapping("/categories/{categoryId}")
@@ -44,9 +63,13 @@ public class CategoryController {
         try {
             addedCategory = this.categoryService.addCategory(category);
             return ResponseEntity.of(Optional.of(addedCategory));
+
         } catch (Exception e) {
-            e.printStackTrace();
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+            throw new CustomErrorException(
+                    HttpStatus.INTERNAL_SERVER_ERROR,
+                    "Error in adding new category",
+                    category
+            );
         }
     }
 

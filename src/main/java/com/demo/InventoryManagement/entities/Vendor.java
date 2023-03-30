@@ -20,7 +20,7 @@ public class Vendor {
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE)
     @Column(name = "vendorId")
-    private long vendorId;
+    public long vendorId;
     @Column(name = "vendorName", unique = true)
     @NonNull
     private String vendorName;
